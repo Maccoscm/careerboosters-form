@@ -1,1 +1,336 @@
-# careerboosters-form
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerBoosters Order Instructions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 768px;
+            margin: auto;
+            padding: 1rem;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .form-select, .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            background-color: #ffffff;
+            transition: all 0.2s;
+        }
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        /* Custom modal for alerts */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+        .custom-modal-content {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .modal-btn {
+            background-color: #2563eb;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .modal-btn:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <!-- Custom Modal -->
+    <div id="modal" class="custom-modal">
+        <div class="custom-modal-content">
+            <p id="modal-message" class="text-gray-800 text-lg font-semibold"></p>
+            <button id="modal-close" class="modal-btn">OK</button>
+        </div>
+    </div>
+
+    <div class="container bg-white p-8 md:p-10 rounded-xl shadow-lg mt-10">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Order Instructions</h1>
+        </div>
+        
+        <p class="text-gray-600 mb-6">Please provide the details for your purchased order below. The estimated cost will be calculated automatically.</p>
+
+        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
+            <p class="text-sm text-gray-500 mb-2">Authenticated User ID:</p>
+            <code id="userIdDisplay" class="text-xs md:text-sm font-mono bg-white text-gray-700 p-2 rounded block break-all">Loading...</code>
+        </div>
+        
+        <form id="orderForm" class="space-y-6">
+            <div class="form-group">
+                <label for="serviceSelect" class="block text-gray-700">Service Type</label>
+                <select id="serviceSelect" class="form-select">
+                    <option value="" disabled selected>Select a service</option>
+                    <option value="Editing">Editing</option>
+                    <option value="Proposal Editing">Proposal Editing</option>
+                    <option value="Coaching Session">Coaching Session</option>
+                </select>
+            </div>
+
+            <div id="productGroup" class="form-group hidden">
+                <label for="productSelect" class="block text-gray-700">Product</label>
+                <select id="productSelect" class="form-select">
+                    <!-- Options will be populated by JS -->
+                </select>
+            </div>
+
+            <div id="wordCountGroup" class="form-group hidden">
+                <label for="wordCount" class="block text-gray-700">Word Count (e.g., 2500)</label>
+                <input type="number" id="wordCount" class="form-input" min="0" placeholder="Enter word count">
+            </div>
+            
+            <div class="form-group">
+                <label for="instructions" class="block text-gray-700">Special Instructions</label>
+                <textarea id="instructions" class="form-textarea h-32" placeholder="Provide any specific details or requests here..."></textarea>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg flex items-center justify-between">
+                <div class="font-medium">Estimated Cost</div>
+                <div id="costDisplay" class="text-xl font-bold">$0.00</div>
+            </div>
+
+            <p id="statusMessage" class="text-center text-sm text-gray-500 min-h-[20px]">
+                <span id="savingStatus"></span>
+                <span id="saveError" class="text-red-500"></span>
+            </p>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Enable Firestore debug logging
+        setLogLevel('Debug');
+
+        // Global variables for Firebase config and token
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Firebase Setup and Authentication ---
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let userId = '';
+        let authReady = false;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                authReady = true;
+                document.getElementById('userIdDisplay').textContent = userId;
+                
+                // Set up real-time listener for user data
+                const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'order_instructions', 'current_order');
+                onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists() && authReady) {
+                        const data = docSnap.data();
+                        loadData(data);
+                    }
+                }, (error) => {
+                    showModal('Error loading data: ' + error.message);
+                    console.error("Error listening to document: ", error);
+                });
+
+            } else {
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    showModal('Authentication failed: ' + error.message);
+                    console.error("Authentication failed:", error);
+                }
+            }
+        });
+
+        // --- Pricing Data ---
+        const prices = {
+            'Editing': {
+                'Standard (7 days)': 30,
+                'Express (3 days)': 45,
+                'Rush (48 hours)': 60
+            },
+            'Proposal Editing': {
+                'Standard (7 days)': 25,
+                'Express (3 days)': 40,
+                'Rush (48 hours)': 55
+            },
+            'Coaching Session': {
+                '60 mins': 60
+            }
+        };
+
+        // --- Form Element References ---
+        const serviceSelect = document.getElementById('serviceSelect');
+        const productGroup = document.getElementById('productGroup');
+        const productSelect = document.getElementById('productSelect');
+        const wordCountGroup = document.getElementById('wordCountGroup');
+        const wordCountInput = document.getElementById('wordCount');
+        const instructionsTextarea = document.getElementById('instructions');
+        const costDisplay = document.getElementById('costDisplay');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // --- Modal Functions ---
+        const modal = document.getElementById('modal');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close');
+
+        function showModal(message) {
+            modalMessage.textContent = message;
+            modal.style.display = 'flex';
+        }
+
+        modalCloseBtn.onclick = () => {
+            modal.style.display = 'none';
+        };
+
+        window.onclick = (event) => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // --- Form Logic ---
+        function updateProductOptions() {
+            const service = serviceSelect.value;
+            productSelect.innerHTML = '';
+            
+            if (service === 'Coaching Session') {
+                productGroup.classList.add('hidden');
+                wordCountGroup.classList.add('hidden');
+            } else {
+                productGroup.classList.remove('hidden');
+                wordCountGroup.classList.remove('hidden');
+                const products = Object.keys(prices[service]);
+                products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product;
+                    option.textContent = product;
+                    productSelect.appendChild(option);
+                });
+            }
+            calculateCost();
+        }
+
+        function calculateCost() {
+            const service = serviceSelect.value;
+            let totalCost = 0;
+            
+            if (service === 'Coaching Session') {
+                totalCost = prices['Coaching Session']['60 mins'];
+            } else if (service) {
+                const product = productSelect.value;
+                const wordCount = parseInt(wordCountInput.value) || 0;
+                const costPerThousand = prices[service][product];
+                if (costPerThousand) {
+                    totalCost = (wordCount / 1000) * costPerThousand;
+                }
+            }
+            
+            costDisplay.textContent = `$${totalCost.toFixed(2)}`;
+            saveData();
+        }
+
+        // --- Data Loading and Saving ---
+        function loadData(data) {
+            if (data.serviceType) serviceSelect.value = data.serviceType;
+            updateProductOptions();
+            if (data.product) productSelect.value = data.product;
+            if (data.wordCount) wordCountInput.value = data.wordCount;
+            if (data.instructions) instructionsTextarea.value = data.instructions;
+            calculateCost();
+        }
+
+        let saveTimeout;
+        async function saveData() {
+            if (!authReady || !userId) return;
+            clearTimeout(saveTimeout);
+            statusMessage.innerHTML = '<span id="savingStatus">Saving...</span>';
+
+            saveTimeout = setTimeout(async () => {
+                const data = {
+                    serviceType: serviceSelect.value,
+                    product: productSelect.value,
+                    wordCount: parseInt(wordCountInput.value) || 0,
+                    instructions: instructionsTextarea.value,
+                    estimatedCost: parseFloat(costDisplay.textContent.replace('$', ''))
+                };
+
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'order_instructions', 'current_order');
+
+                try {
+                    await setDoc(docRef, data);
+                    statusMessage.innerHTML = '<span id="savingStatus">Saved!</span>';
+                } catch (e) {
+                    statusMessage.innerHTML = '<span id="saveError" class="text-red-500">Error saving: ' + e.message + '</span>';
+                    console.error("Error adding document: ", e);
+                }
+            }, 500); // Debounce saving by 500ms
+        }
+
+        // --- Event Listeners ---
+        serviceSelect.addEventListener('change', updateProductOptions);
+        productSelect.addEventListener('change', calculateCost);
+        wordCountInput.addEventListener('input', calculateCost);
+        instructionsTextarea.addEventListener('input', saveData);
+        
+    </script>
+</body>
+</html>
