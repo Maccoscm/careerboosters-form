@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareerBoosters Order Confirmation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --navy-blue: #1A2526;
+      --white: #FFFFFF;
+      --gold: #D4A017;
+    }
+    body {
+      background-color: var(--white);
+    }
+    .navy-blue-bg {
+      background-color: var(--navy-blue);
+    }
+    .navy-blue-text {
+      color: var(--navy-blue);
+    }
+    .gold-text {
+      color: var(--gold);
+    }
+    .gold-border {
+      border-color: var(--gold);
+    }
+    .white-bg {
+      background-color: var(--white);
+    }
+    .white-text {
+      color: var(--white);
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212, 160, 23, 0.2);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+  <div class="white-bg p-8 rounded-lg shadow-lg w-full max-w-md border gold-border">
+    <h1 class="text-2xl font-bold mb-6 text-center navy-blue-text">Submit Your Order Instructions</h1>
+    <p class="text-sm navy-blue-text mb-4">Thank you for your payment! Please provide your instructions below.</p>
+    <form id="confirmationForm" class="space-y-4" action="https://formspree.io/f/your-endpoint-hash" method="POST" enctype="multipart/form-data">
+      <div>
+        <label for="customerId" class="block text-sm font-medium navy-blue-text">Customer ID</label>
+        <input type="text" id="customerId" name="customerId" class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" readonly>
+      </div>
+      <div>
+        <label for="serviceType" class="block text-sm font-medium navy-blue-text">Service Type</label>
+        <input type="text" id="serviceType" name="serviceType" class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" readonly>
+      </div>
+      <div id="deliverySpeedContainer" class="hidden">
+        <label for="deliverySpeed" class="block text-sm font-medium navy-blue-text">Delivery Speed</label>
+        <input type="text" id="deliverySpeed" name="deliverySpeed" class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" readonly>
+      </div>
+      <div id="wordCountContainer" class="hidden">
+        <label for="wordCount" class="block text-sm font-medium navy-blue-text">Word Count</label>
+        <input type="text" id="wordCount" name="wordCount" class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" readonly>
+      </div>
+      <div id="hoursContainer" class="hidden">
+        <label for="hours" class="block text-sm font-medium navy-blue-text">Hours</label>
+        <input type="text" id="hours" name="hours" class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" readonly>
+      </div>
+      <div>
+        <p id="totalCost" class="mt-2 text-lg font-semibold gold-text text-center">Total Paid: $0.00</p>
+      </div>
+      <div>
+        <label for="instructions" class="block text-sm font-medium navy-blue-text">Instructions</label>
+        <textarea id="instructions" name="instructions" rows="5" class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" placeholder="Provide detailed instructions for your order" required></textarea>
+      </div>
+      <div>
+        <label for="fileUpload" class="block text-sm font-medium navy-blue-text">Upload Document (Optional)</label>
+        <input type="file" id="fileUpload" name="fileUpload" class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text">
+      </div>
+      <div>
+        <button type="submit" class="w-full navy-blue-bg white-text p-2 rounded-md hover:bg-opacity-90">Submit Instructions</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Load stored order data
+    const orderData = JSON.parse(localStorage.getItem('orderData') || '{}');
+    document.getElementById('customerId').value = orderData.customerId || 'N/A';
+    document.getElementById('serviceType').value = orderData.serviceType || 'N/A';
+    if (orderData.serviceType !== 'coaching') {
+      document.getElementById('deliverySpeedContainer').classList.remove('hidden');
+      document.getElementById('wordCountContainer').classList.remove('hidden');
+      document.getElementById('deliverySpeed').value = orderData.deliverySpeed || 'N/A';
+      document.getElementById('wordCount').value = orderData.wordCount || 'N/A';
+    } else {
+      document.getElementById('hoursContainer').classList.remove('hidden');
+      document.getElementById('hours').value = orderData.hours || 'N/A';
+    }
+    document.getElementById('totalCost').textContent = `Total Paid: $${(orderData.totalCost || 0).toFixed(2)}`;
+
+    document.getElementById('confirmationForm').addEventListener('submit', function(e) {
+      // Formspree handles submission; no additional JS needed
+      localStorage.removeItem('orderData'); // Clean up after submission
+    });
+  </script>
+</body>
+</html>
