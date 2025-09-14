@@ -1,336 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareerBoosters Order Instructions</title>
+    <title>CareerBoosters Order Form</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        :root {
+            --navy-blue: #1A2526;
+            --white: #FFFFFF;
+            --gold: #D4A017;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            color: #1f2937;
+            background-color: var(--white);
         }
-        .container {
-            max-width: 768px;
-            margin: auto;
-            padding: 1rem;
+
+        .navy-blue-bg {
+            background-color: var(--navy-blue);
         }
-        .form-group label {
-            font-weight: 500;
-            color: #4b5563;
+
+        .navy-blue-text {
+            color: var(--navy-blue);
         }
-        .form-select, .form-input, .form-textarea {
-            width: 100%;
-            padding: 0.75rem;
-            margin-top: 0.5rem;
-            border-radius: 0.5rem;
-            border: 1px solid #d1d5db;
-            background-color: #ffffff;
-            transition: all 0.2s;
+
+        .gold-bg {
+            background-color: var(--gold);
         }
-        .form-select:focus, .form-input:focus, .form-textarea:focus {
+
+        .gold-text {
+            color: var(--gold);
+        }
+
+        .gold-border {
+            border-color: var(--gold);
+        }
+
+        .white-bg {
+            background-color: var(--white);
+        }
+
+        .white-text {
+            color: var(--white);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-        }
-        .btn-primary {
-            background-color: #2563eb;
-            color: #ffffff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-        }
-        /* Custom modal for alerts */
-        .custom-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-        }
-        .custom-modal-content {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .modal-btn {
-            background-color: #2563eb;
-            color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        .modal-btn:hover {
-            background-color: #1d4ed8;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(212, 160, 23, 0.2);
         }
     </style>
 </head>
-<body class="bg-gray-100 p-4">
 
-    <!-- Custom Modal -->
-    <div id="modal" class="custom-modal">
-        <div class="custom-modal-content">
-            <p id="modal-message" class="text-gray-800 text-lg font-semibold"></p>
-            <button id="modal-close" class="modal-btn">OK</button>
-        </div>
-    </div>
-
-    <div class="container bg-white p-8 md:p-10 rounded-xl shadow-lg mt-10">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Order Instructions</h1>
-        </div>
-        
-        <p class="text-gray-600 mb-6">Please provide the details for your purchased order below. The estimated cost will be calculated automatically.</p>
-
-        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-            <p class="text-sm text-gray-500 mb-2">Authenticated User ID:</p>
-            <code id="userIdDisplay" class="text-xs md:text-sm font-mono bg-white text-gray-700 p-2 rounded block break-all">Loading...</code>
-        </div>
-        
-        <form id="orderForm" class="space-y-6">
-            <div class="form-group">
-                <label for="serviceSelect" class="block text-gray-700">Service Type</label>
-                <select id="serviceSelect" class="form-select">
+<body class="flex items-center justify-center min-h-screen">
+    <div class="white-bg p-8 rounded-lg shadow-lg w-full max-w-md border gold-border">
+        <h1 class="text-2xl font-bold mb-6 text-center navy-blue-text">CareerBoosters Order Instructions</h1>
+        <form id="orderForm" class="space-y-4">
+            <div>
+                <label for="customerId" class="block text-sm font-medium navy-blue-text">Customer ID</label>
+                <input type="text" id="customerId" name="customerId"
+                    class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" readonly>
+            </div>
+            <div>
+                <label for="serviceType" class="block text-sm font-medium navy-blue-text">Service Type</label>
+                <select id="serviceType" name="serviceType"
+                    class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" required>
                     <option value="" disabled selected>Select a service</option>
-                    <option value="Editing">Editing</option>
-                    <option value="Proposal Editing">Proposal Editing</option>
-                    <option value="Coaching Session">Coaching Session</option>
+                    <option value="dissertationEditing">Dissertation Editing</option>
+                    <option value="proposalEditing">Proposal Editing</option>
+                    <option value="coaching">Coaching</option>
                 </select>
             </div>
-
-            <div id="productGroup" class="form-group hidden">
-                <label for="productSelect" class="block text-gray-700">Product</label>
-                <select id="productSelect" class="form-select">
-                    <!-- Options will be populated by JS -->
+            <div id="deliverySpeedContainer" class="hidden">
+                <label for="deliverySpeed" class="block text-sm font-medium navy-blue-text">Delivery Speed</label>
+                <select id="deliverySpeed" name="deliverySpeed"
+                    class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text" required>
+                    <option value="" disabled selected>Select delivery speed</option>
+                    <option value="standard">Standard (7 days)</option>
+                    <option value="express">Express (3 days)</option>
+                    <option value="rush">Rush (48 hours)</option>
                 </select>
             </div>
-
-            <div id="wordCountGroup" class="form-group hidden">
-                <label for="wordCount" class="block text-gray-700">Word Count (e.g., 2500)</label>
-                <input type="number" id="wordCount" class="form-input" min="0" placeholder="Enter word count">
+            <div id="wordCountContainer" class="hidden">
+                <label for="wordCount" class="block text-sm font-medium navy-blue-text">Word Count</label>
+                <input type="number" id="wordCount" name="wordCount" min="1"
+                    class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text"
+                    placeholder="Enter word count" required>
             </div>
-            
-            <div class="form-group">
-                <label for="instructions" class="block text-gray-700">Special Instructions</label>
-                <textarea id="instructions" class="form-textarea h-32" placeholder="Provide any specific details or requests here..."></textarea>
+            <div id="hoursContainer" class="hidden">
+                <label for="hours" class="block text-sm font-medium navy-blue-text">Hours</label>
+                <input type="number" id="hours" name="hours" min="1" step="0.5"
+                    class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text"
+                    placeholder="Enter hours (e.g., 1.5)" required>
             </div>
-
-            <div class="bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg flex items-center justify-between">
-                <div class="font-medium">Estimated Cost</div>
-                <div id="costDisplay" class="text-xl font-bold">$0.00</div>
+            <div>
+                <p id="costEstimate" class="mt-2 text-lg font-semibold gold-text text-center">Estimated Cost: $0.00</p>
             </div>
-
-            <p id="statusMessage" class="text-center text-sm text-gray-500 min-h-[20px]">
-                <span id="savingStatus"></span>
-                <span id="saveError" class="text-red-500"></span>
-            </p>
+            <div>
+                <label for="instructions" class="block text-sm font-medium navy-blue-text">Instructions</label>
+                <textarea id="instructions" name="instructions" rows="5"
+                    class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text"
+                    placeholder="Provide detailed instructions for your order" required></textarea>
+            </div>
+            <div>
+                <label for="fileUpload" class="block text-sm font-medium navy-blue-text">Upload Document
+                    (Optional)</label>
+                <input type="file" id="fileUpload" name="fileUpload"
+                    class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text">
+            </div>
+            <div>
+                <button type="submit" class="w-full navy-blue-bg white-text p-2 rounded-md hover:bg-opacity-90">Submit
+                    Order</button>
+            </div>
         </form>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Enable Firestore debug logging
-        setLogLevel('Debug');
-
-        // Global variables for Firebase config and token
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // --- Firebase Setup and Authentication ---
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        let userId = '';
-        let authReady = false;
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                authReady = true;
-                document.getElementById('userIdDisplay').textContent = userId;
-                
-                // Set up real-time listener for user data
-                const userDocRef = doc(db, 'artifacts', appId, 'users', userId, 'order_instructions', 'current_order');
-                onSnapshot(userDocRef, (docSnap) => {
-                    if (docSnap.exists() && authReady) {
-                        const data = docSnap.data();
-                        loadData(data);
-                    }
-                }, (error) => {
-                    showModal('Error loading data: ' + error.message);
-                    console.error("Error listening to document: ", error);
-                });
-
-            } else {
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (error) {
-                    showModal('Authentication failed: ' + error.message);
-                    console.error("Authentication failed:", error);
-                }
-            }
-        });
-
-        // --- Pricing Data ---
-        const prices = {
-            'Editing': {
-                'Standard (7 days)': 30,
-                'Express (3 days)': 45,
-                'Rush (48 hours)': 60
-            },
-            'Proposal Editing': {
-                'Standard (7 days)': 25,
-                'Express (3 days)': 40,
-                'Rush (48 hours)': 55
-            },
-            'Coaching Session': {
-                '60 mins': 60
-            }
-        };
-
-        // --- Form Element References ---
-        const serviceSelect = document.getElementById('serviceSelect');
-        const productGroup = document.getElementById('productGroup');
-        const productSelect = document.getElementById('productSelect');
-        const wordCountGroup = document.getElementById('wordCountGroup');
-        const wordCountInput = document.getElementById('wordCount');
-        const instructionsTextarea = document.getElementById('instructions');
-        const costDisplay = document.getElementById('costDisplay');
-        const statusMessage = document.getElementById('statusMessage');
-
-        // --- Modal Functions ---
-        const modal = document.getElementById('modal');
-        const modalMessage = document.getElementById('modal-message');
-        const modalCloseBtn = document.getElementById('modal-close');
-
-        function showModal(message) {
-            modalMessage.textContent = message;
-            modal.style.display = 'flex';
+    <script>
+        // Simulate server-side customer ID generation
+        function generateCustomerId() {
+            return 'CUST-' + Math.random().toString(36).substr(2, 9).toUpperCase();
         }
 
-        modalCloseBtn.onclick = () => {
-            modal.style.display = 'none';
-        };
+        // Set customer ID on page load
+        document.getElementById('customerId').value = generateCustomerId();
 
-        window.onclick = (event) => {
-            if (event.target == modal) {
-                modal.style.display = 'none';
+        const prices = {
+            dissertationEditing: {
+                standard: 35,
+                express: 50,
+                rush: 65
+            },
+            proposalEditing: {
+                standard: 25,
+                express: 40,
+                rush: 55
+            },
+            coaching: {
+                rate: 60 // $60 per hour
             }
         };
 
-        // --- Form Logic ---
-        function updateProductOptions() {
-            const service = serviceSelect.value;
-            productSelect.innerHTML = '';
-            
-            if (service === 'Coaching Session') {
-                productGroup.classList.add('hidden');
-                wordCountGroup.classList.add('hidden');
+        function toggleInputFields() {
+            const serviceType = document.getElementById('serviceType').value;
+            const deliverySpeedContainer = document.getElementById('deliverySpeedContainer');
+            const wordCountContainer = document.getElementById('wordCountContainer');
+            const hoursContainer = document.getElementById('hoursContainer');
+
+            if (serviceType === 'coaching') {
+                deliverySpeedContainer.classList.add('hidden');
+                wordCountContainer.classList.add('hidden');
+                hoursContainer.classList.remove('hidden');
+                document.getElementById('deliverySpeed').removeAttribute('required');
+                document.getElementById('wordCount').removeAttribute('required');
+                document.getElementById('hours').setAttribute('required', '');
             } else {
-                productGroup.classList.remove('hidden');
-                wordCountGroup.classList.remove('hidden');
-                const products = Object.keys(prices[service]);
-                products.forEach(product => {
-                    const option = document.createElement('option');
-                    option.value = product;
-                    option.textContent = product;
-                    productSelect.appendChild(option);
-                });
+                deliverySpeedContainer.classList.remove('hidden');
+                wordCountContainer.classList.remove('hidden');
+                hoursContainer.classList.add('hidden');
+                document.getElementById('deliverySpeed').setAttribute('required', '');
+                document.getElementById('wordCount').setAttribute('required', '');
+                document.getElementById('hours').removeAttribute('required');
             }
             calculateCost();
         }
 
         function calculateCost() {
-            const service = serviceSelect.value;
-            let totalCost = 0;
-            
-            if (service === 'Coaching Session') {
-                totalCost = prices['Coaching Session']['60 mins'];
-            } else if (service) {
-                const product = productSelect.value;
-                const wordCount = parseInt(wordCountInput.value) || 0;
-                const costPerThousand = prices[service][product];
-                if (costPerThousand) {
-                    totalCost = (wordCount / 1000) * costPerThousand;
-                }
+            const serviceType = document.getElementById('serviceType').value;
+            const deliverySpeed = document.getElementById('deliverySpeed').value;
+            const wordCount = parseInt(document.getElementById('wordCount').value) || 0;
+            const hours = parseFloat(document.getElementById('hours').value) || 0;
+            const costEstimate = document.getElementById('costEstimate');
+
+            if (serviceType === 'coaching' && hours > 0) {
+                const totalCost = hours * prices.coaching.rate;
+                costEstimate.textContent = `Estimated Cost: $${totalCost.toFixed(2)}`;
+            } else if (serviceType && deliverySpeed && wordCount > 0) {
+                const costPerThousand = prices[serviceType][deliverySpeed];
+                const totalCost = (wordCount / 1000) * costPerThousand;
+                costEstimate.textContent = `Estimated Cost: $${totalCost.toFixed(2)}`;
+            } else {
+                costEstimate.textContent = 'Estimated Cost: $0.00';
             }
-            
-            costDisplay.textContent = `$${totalCost.toFixed(2)}`;
-            saveData();
         }
 
-        // --- Data Loading and Saving ---
-        function loadData(data) {
-            if (data.serviceType) serviceSelect.value = data.serviceType;
-            updateProductOptions();
-            if (data.product) productSelect.value = data.product;
-            if (data.wordCount) wordCountInput.value = data.wordCount;
-            if (data.instructions) instructionsTextarea.value = data.instructions;
+        // Attach event listeners
+        document.getElementById('serviceType').addEventListener('change', () => {
+            toggleInputFields();
             calculateCost();
-        }
+        });
+        document.getElementById('deliverySpeed').addEventListener('change', calculateCost);
+        document.getElementById('wordCount').addEventListener('input', calculateCost);
+        document.getElementById('hours').addEventListener('input', calculateCost);
 
-        let saveTimeout;
-        async function saveData() {
-            if (!authReady || !userId) return;
-            clearTimeout(saveTimeout);
-            statusMessage.innerHTML = '<span id="savingStatus">Saving...</span>';
+        // Initial setup
+        toggleInputFields();
+        calculateCost();
 
-            saveTimeout = setTimeout(async () => {
-                const data = {
-                    serviceType: serviceSelect.value,
-                    product: productSelect.value,
-                    wordCount: parseInt(wordCountInput.value) || 0,
-                    instructions: instructionsTextarea.value,
-                    estimatedCost: parseFloat(costDisplay.textContent.replace('$', ''))
-                };
-
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'order_instructions', 'current_order');
-
-                try {
-                    await setDoc(docRef, data);
-                    statusMessage.innerHTML = '<span id="savingStatus">Saved!</span>';
-                } catch (e) {
-                    statusMessage.innerHTML = '<span id="saveError" class="text-red-500">Error saving: ' + e.message + '</span>';
-                    console.error("Error adding document: ", e);
-                }
-            }, 500); // Debounce saving by 500ms
-        }
-
-        // --- Event Listeners ---
-        serviceSelect.addEventListener('change', updateProductOptions);
-        productSelect.addEventListener('change', calculateCost);
-        wordCountInput.addEventListener('input', calculateCost);
-        instructionsTextarea.addEventListener('input', saveData);
-        
+        document.getElementById('orderForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const customerId = document.getElementById('customerId').value;
+            if (!customerId) {
+                alert('Customer ID is missing. Please reload the page to generate a new ID.');
+                return;
+            }
+            alert(`Order submitted successfully! Your Customer ID is ${customerId}. We will review your instructions and get back to you soon.`);
+        });
     </script>
 </body>
+
 </html>
