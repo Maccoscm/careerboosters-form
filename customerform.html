@@ -109,7 +109,7 @@
             <div>
                 <label for="fileUpload" class="block text-sm font-medium navy-blue-text">Upload Document
                     (Optional)</label>
-                <input type="file" id="fileUpload" name="fileUpload"
+                <input type="file" id="fileUpload" name="fileUpload" accept=".pdf,.doc,.docx"
                     class="mt-1 block w-full p-2 border gold-border rounded-md white-bg navy-blue-text">
             </div>
             <div>
@@ -119,7 +119,68 @@
         </form>
     </div>
 
+    <script src="https://formspree.io/js/f/mvgbnbqa/form.js" defer></script>
     <script>
+        // Formspree JS library handles AJAX submission with success/error callbacks
+        document.getElementById('orderForm').addEventListener('submit', function (e) {
+            const customerId = document.getElementById('customerId').value;
+            if (!customerId) {
+                e.preventDefault();
+                alert('Customer ID is missing. Please reload the page to generate a new ID.');
+                return;
+            }
+
+            // Validate required fields based on service type
+            const serviceType = document.getElementById('serviceType').value;
+            if (!serviceType) {
+                e.preventDefault();
+                alert('Please select a service type.');
+                return;
+            }
+            if (serviceType === 'coaching') {
+                const hours = document.getElementById('hours').value;
+                if (!hours || hours <= 0) {
+                    e.preventDefault();
+                    alert('Please enter the number of hours for coaching.');
+                    return;
+                }
+            } else {
+                const deliverySpeed = document.getElementById('deliverySpeed').value;
+                const wordCount = document.getElementById('wordCount').value;
+                if (!deliverySpeed || !wordCount || wordCount <= 0) {
+                    e.preventDefault();
+                    alert('Please select delivery speed and enter word count.');
+                    return;
+                }
+            }
+            if (!document.getElementById('instructions').value.trim()) {
+                e.preventDefault();
+                alert('Please provide instructions.');
+                return;
+            }
+
+            // Store order data for confirmation page
+            const orderData = {
+                customerId: customerId,
+                serviceType: serviceType,
+                deliverySpeed: document.getElementById('deliverySpeed').value,
+                wordCount: document.getElementById('wordCount').value,
+                hours: document.getElementById('hours').value,
+                totalCost: parseFloat(document.getElementById('costEstimate').textContent.replace('Estimated Cost: $', '')) || 0
+            };
+            localStorage.setItem('orderData', JSON.stringify(orderData));
+        });
+
+        // Success/Error callbacks via Formspree JS (after submission)
+        window.formspreeSuccess = function () {
+            alert('Order submitted successfully! Your Customer ID is ' + document.getElementById('customerId').value + '. We will review your instructions and get back to you soon.');
+            // Optional: Redirect to confirmation page
+            // window.location.href = 'confirmation.html';
+        };
+        window.formspreeFailure = function () {
+            alert('Submission failed. Please try again or check your connection. If issues persist, contact support.');
+        };
+
         // Simulate server-side customer ID generation
         function generateCustomerId() {
             return 'CUST-' + Math.random().toString(36).substr(2, 9).toUpperCase();
@@ -199,26 +260,6 @@
         // Initial setup
         toggleInputFields();
         calculateCost();
-
-        document.getElementById('orderForm').addEventListener('submit', function (e) {
-            const customerId = document.getElementById('customerId').value;
-            if (!customerId) {
-                alert('Customer ID is missing. Please reload the page to generate a new ID.');
-                return;
-            }
-            // Store order data for confirmation page
-            const orderData = {
-                customerId: customerId,
-                serviceType: document.getElementById('serviceType').value,
-                deliverySpeed: document.getElementById('deliverySpeed').value,
-                wordCount: document.getElementById('wordCount').value,
-                hours: document.getElementById('hours').value,
-                totalCost: parseFloat(document.getElementById('costEstimate').textContent.replace('Estimated Cost: $', '')) || 0
-            };
-            localStorage.setItem('orderData', JSON.stringify(orderData));
-            // Formspree will handle submission; allow form to submit
-            alert(`Order submitted successfully! Your Customer ID is ${customerId}. We will review your instructions and get back to you soon.`);
-        });
     </script>
 </body>
 
